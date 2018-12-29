@@ -1,0 +1,191 @@
+<style>
+    #loader {
+        position: absolute;
+        background: white;
+        width: 100vw;
+        height: 100vh;
+        z-index: 10;
+    }
+
+
+
+
+
+    /* loader css */
+    .loader-container {
+        position: relative;
+        top: 200px;
+        height: 50px;
+        width: 50px;
+        animation: loader-container 10s linear infinite;
+    }
+
+    .loader-container > div {
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        box-shadow: 0 0 10px -2px rgba(0, 0, 0, 0.5);
+        animation-duration: 2500ms;
+        animation-timing-function: ease-in-out;
+        animation-iteration-count: infinite;
+    }
+
+    .box1 {
+        background-color: #82b1ff;
+        top: 4px;
+        left: 4px;
+        transform-origin: bottom center;
+        animation-name: box1;
+    }
+
+    .box2 {
+        background-color: #448aff;
+        top: 4px;
+        right: 4px;
+        transform-origin: center left;
+        animation-name: box2;
+    }
+
+    .box3 {
+        background-color: #2979ff;
+        bottom: 4px;
+        right: 4px;
+        transform-origin: top center;
+        animation-name: box3;
+    }
+
+    .box4 {
+        background-color: #2962ff;
+        bottom: 4px;
+        left: 4px;
+        transform-origin: center right;
+        animation-name: box4;
+    }
+
+    @keyframes box1 {
+        0% {
+            transform: perspective(200px) rotateX(90deg);
+        }
+        11% {
+            transform: perspective(200px) rotateX(0);
+        }
+        88% {
+            transform: perspective(200px) rotateX(0);
+        }
+        99% {
+            transform: perspective(200px) rotateX(90deg);
+        }
+        100% {
+            transform: perspective(200px) rotateX(90deg);
+        }
+    }
+
+    @keyframes box2 {
+        0% {
+            transform: perspective(200px) rotateY(90deg);
+        }
+        11% {
+            transform: perspective(200px) rotateY(90deg);
+        }
+        22% {
+            transform: perspective(200px) rotateY(0);
+        }
+        77% {
+            transform: perspective(200px) rotateY(0);
+        }
+        88% {
+            transform: perspective(200px) rotateY(90deg);
+        }
+        100% {
+            transform: perspective(200px) rotateY(90deg);
+        }
+    }
+
+    @keyframes box3 {
+        0% {
+            transform: perspective(200px) rotateX(-90deg);
+        }
+        22% {
+            transform: perspective(200px) rotateX(-90deg);
+        }
+        33% {
+            transform: perspective(200px) rotateX(0);
+        }
+        66% {
+            transform: perspective(200px) rotateX(0);
+        }
+        77% {
+            transform: perspective(200px) rotateX(-90deg);
+        }
+        100% {
+            transform: perspective(200px) rotateX(-90deg);
+        }
+    }
+
+    @keyframes box4 {
+        0% {
+            transform: perspective(200px) rotateY(-90deg);
+        }
+        33% {
+            transform: perspective(200px) rotateY(-90deg);
+        }
+        44% {
+            transform: perspective(200px) rotateY(0);
+        }
+        55% {
+            transform: perspective(200px) rotateY(0);
+        }
+        66% {
+            transform: perspective(200px) rotateY(-90deg);
+        }
+        100% {
+            transform: perspective(200px) rotateY(-90deg);
+        }
+    }
+
+    @keyframes loader-container {
+        0% {
+            transform: rotate(0);
+        }
+        23% {
+            transform: rotate(0);
+        }
+        25% {
+            transform: rotate(90deg);
+        }
+        48% {
+            transform: rotate(90deg);
+        }
+        50% {
+            transform: rotate(180deg);
+        }
+        73% {
+            transform: rotate(180deg);
+        }
+        75% {
+            transform: rotate(270deg);
+        }
+        98% {
+            transform: rotate(270deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+<div id="loader">
+
+<center>
+    <div class="loader-container" style="margin-top: 2vh;">
+        <div class="box1"></div>
+        <div class="box2"></div>
+        <div class="box3"></div>
+        <div class="box4"></div>
+    </div>
+    <br>
+</center>
+
+</div>
+
+<script>
+</script>

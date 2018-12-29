@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <head>
+        <% include ../common/head.ejs %>
+        <!-- CSS  -->
+
+
+        <!--icons-->
+
+
+
+        <!--fonts-->
+
+
+        <!--scripts-->
+
+
+        <style>
+            <% include ../../common/style.css %>
+            <% include ../common/style.css %>
+        </style>
+
+    </head>
+<body>
+
+<div id="loader">
+    <% include ../common/loader.ejs %>
+</div>
+
+<% include main.ejs %>
+
+<script>
+
+    <% include ../../common/script.js %>
+
+    let loadInterval = setInterval(function () {
+        if (document.readyState === 'complete') {
+            clearInterval(loadInterval);
+            document.getElementById("loader").remove();
+        }
+    }, 200);
+
+</script>
+
+
+
+
+</body>
+
+</html>

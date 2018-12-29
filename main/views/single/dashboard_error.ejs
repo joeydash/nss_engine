@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Dashboard</title>
+    <meta name="description" content="design and developed by joeydash">
+    <meta name="author" content="joeydash">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <link rel="icon" href="/images/icon.gif">
+
+</head>
+<body>
+
+<center>
+    <div class="alert alert-danger" style="max-width: 300px;margin-top: 100px;">
+        <strong>Error:</strong> <%= msg%>
+    </div>
+
+</center>
+<script>
+    setTimeout(()=>{
+        location.href = "/";
+    },5000);
+</script>
+</body>
+
+</html>

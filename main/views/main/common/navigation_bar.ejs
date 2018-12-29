@@ -1,0 +1,200 @@
+<style>
+
+    nav ul a {
+        color: #88AAA9 !important;
+    }
+
+    nav .brand-logo {
+        color: #846C63 !important;
+    }
+
+    p {
+        line-height: 2rem;
+    }
+
+    .sidenav-trigger {
+        color: #88AAA9 !important;
+    }
+</style>
+
+<div id="my_navbar">
+    <div class="navbar navbar-fixed">
+        <nav class="white" role="navigation">
+            <div class="nav-wrapper container ">
+                <a onclick="location.href= '/'" style="color: #88AAA9 !important;">
+                    <img src="/images/icon.gif" style="height: 80%;">&nbsp;&nbsp;National Service Scheme
+                </a>
+
+                <a id="logo-container" href="/" class="brand-logo"> </a>
+                <ul class="right hide-on-med-and-down">
+                    <li v-for="nav in navigation_list"><a v-bind:href="nav.href">{{nav.name}}</a></li>
+                    <li v-if="!user_details.is_signed_in"><a class="modal-trigger" href="#sign_in_modal">Sign in</a>
+                    </li>
+                    <li v-if="is_manager && user_details.is_signed_in"><a href="/dashboard/events">Dashboard</a></li>
+                    <li v-if="user_details.is_signed_in"><a href="#profile_modal" class="modal-trigger">{{user_details.name}}</a>
+                    </li>
+
+                </ul>
+                <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+
+
+            </div>
+        </nav>
+    </div>
+    <ul id="nav-mobile" class="sidenav">
+        <li v-for="nav in navigation_list"><a v-bind:href="nav.href">{{nav.name}}</a></li>
+        <li v-if="!user_details.is_signed_in"><a class="modal-trigger" href="#sign_in_modal">Sign in</a></li>
+        <li v-if="is_manager && user_details.is_signed_in"><a href="/dashboard/events">Dashboard</a></li>
+        <li v-if="user_details.is_signed_in"><a href="#profile_modal" class="modal-trigger">{{user_details.name}}</a>
+        </li>
+    </ul>
+
+
+    <!-- Modal sign in -->
+    <div id="sign_in_modal" class="modal" style="max-width: 200px;">
+        <div class="modal-content">
+            <center>
+
+                <div class="g-signin2" data-onsuccess="onSignIn"></div>
+            </center>
+        </div>
+    </div>
+
+
+    <!-- Modal profile -->
+    <div class="modal" style="max-width: 300px;" id="profile_modal">
+        <div class="modal-content">
+            <center>
+
+                <img src="/images/icon.png" alt="Avatar" style="border-radius: 50%;margin: 4px 0 0 4px;
+    box-shadow: 0 0 0 4px #fff;" v-bind:src="user_details.image_url">
+                <h5 style="color: #1a237e;">{{user_details.name}}</h5>
+                <h6 style="color: #00695c;">{{user_details.email}}</h6>
+
+
+                <!--<table class="highlight">-->
+                <!--<tbody>-->
+                <!--<tr onclick="location.href= '/user'" style="cursor: pointer;">-->
+                <!--<td>My Designs</td>-->
+                <!--<td>{{user_designs_count}}</td>-->
+                <!--</tr>-->
+                <!--<tr style="cursor: pointer;">-->
+                <!--<td>My Orders</td>-->
+                <!--<td>0</td>-->
+                <!--</tr>-->
+                <!--<tr style="cursor: pointer;">-->
+
+                <!--<td>My addresses</td>-->
+                <!--<td>0</td>-->
+
+                <!--</tr>-->
+                <!--</tbody>-->
+                <!--</table>-->
+
+
+            </center>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-close waves-effect waves-green btn-flat orange darken-4" style="color: #fff;"
+               onclick="signOut();">Sign out</a>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    let my_navbar = new Vue({
+        el: '#my_navbar',
+        data: {
+            is_manager: false,
+            navigation_list: [
+                // {
+                //     name: "Who we are",
+                //     href: "/"
+                // },
+                {
+                    name: "Events",
+                    href: "/events"
+                },
+                // {
+                //     name: "Projects",
+                //     href: "/projects"
+                // }
+            ],
+            user_details: {
+                is_signed_in: false
+            }
+        },
+        methods: {
+            do_after_load: function () {
+                this.filter_navigation_bar();
+                // this.check_user_details_exist();
+            },
+            filter_navigation_bar: function () {
+                this.navigation_list = this.navigation_list.filter(x => x.href !== window.location.pathname);
+            },
+            check_user_details_exist: function () {
+                if (Cookies.get('nss_user_details') !== undefined) {
+                    this.user_details = JSON.parse(Cookies.get('nss_user_details'));
+                }
+            },
+            check_is_manager: function () {
+                axios.post('/db/user/is_manager')
+                    .then(function (response) {
+                        if (response.data.RESPONSE_CODE === 108200) {
+                            my_navbar.is_manager = true;
+
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            do_after_sign_in : function () {
+                Cookies.set('nss_user_details', JSON.stringify(this.user_details));
+                $('#sign_in_modal').modal('close');
+                this.check_is_manager();
+                axios.post('/db/google/sign_in', this.user_details)
+                    .then(function (response) {
+                        if (response.data.RESPONSE_CODE === 108200) {
+
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+
+            }
+        }, mounted: function () {
+            this.$nextTick(function () {
+                this.do_after_load();
+            })
+        }
+    });
+
+
+    function onSignIn(googleUser) {
+        let profile = googleUser.getBasicProfile();
+        my_navbar.user_details = {
+            is_signed_in: true,
+            id_token: googleUser.getAuthResponse().id_token,
+            h_id: profile.getId(),
+            name: profile.getName(),
+            image_url: profile.getImageUrl(),
+            email: profile.getEmail()
+        };
+        my_navbar.do_after_sign_in();
+
+    }
+
+
+    function signOut() {
+        Cookies.remove('nss_user_details');
+        let auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+            my_navbar.user_details.is_signed_in = false;
+        });
+    }
+
+
+</script>

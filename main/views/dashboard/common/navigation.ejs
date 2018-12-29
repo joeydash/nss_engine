@@ -1,0 +1,153 @@
+<style>
+
+</style>
+
+
+<div id="my_navbar">
+    <div class="navbar navbar-fixed waves-red">
+        <nav class="white" role="navigation">
+            <div class="nav-wrapper container">
+                <a id="logo-container" href="/dashboard/events" class="brand-logo black-text">Dashboard</a>
+
+                <ul class="right hide-on-med-and-down">
+                    <li v-for="nav in navigation_list"><a v-bind:href="nav.href" class="black-text">{{nav.name}}</a>
+                    </li>
+                    <li v-if="!user_details.is_signed_in"><a class="modal-trigger black-text" href="#sign_in_modal">Sign
+                            in</a>
+                    </li>
+                    <li v-if="user_details.is_signed_in"><a href="#profile_modal" class="modal-trigger black-text">{{user_details.name}}</a>
+                    </li>
+
+                </ul>
+                <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i
+                            class="material-icons black-text">menu</i></a>
+
+
+            </div>
+        </nav>
+    </div>
+    <ul id="nav-mobile" class="sidenav">
+        <li v-for="nav in navigation_list"><a v-bind:href="nav.href" class="black-text">{{nav.name}}</a></li>
+        <li v-if="!user_details.is_signed_in"><a class="modal-trigger black-text" href="#sign_in_modal">Sign in</a>
+        </li>
+        <li v-if="user_details.is_signed_in"><a href="#profile_modal" class="modal-trigger black-text">{{user_details.name}}</a>
+        </li>
+        </li>
+    </ul>
+
+
+    <!-- Modal sign in -->
+    <div id="sign_in_modal" class="modal" style="max-width: 200px;">
+        <div class="modal-content">
+            <center>
+
+                <div class="g-signin2" data-onsuccess="onSignIn"></div>
+            </center>
+        </div>
+    </div>
+
+
+    <!-- Modal profile -->
+    <div class="modal" style="max-width: 300px;" id="profile_modal">
+        <div class="modal-content">
+            <center>
+
+                <img src="/images/icon.gif" alt="Avatar" style="border-radius: 50%;margin: 4px 0 0 4px;
+    box-shadow: 0 0 0 4px #fff;" v-bind:src="user_details.image_url">
+                <h5 style="color: #1a237e;">{{user_details.name}}</h5>
+                <h6 style="color: #00695c;">{{user_details.email}}</h6>
+
+
+            </center>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-close waves-effect waves-green btn-flat orange darken-4" style="color: #fff;"
+               onclick="signOut();">Sign out</a>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    let my_navbar = new Vue({
+        el: '#my_navbar',
+        data: {
+            navigation_list: [
+                {
+                    name: "Events",
+                    href: "/dashboard/events"
+                },
+                {
+                    name: "Main Site",
+                    href: "/"
+                }
+            ],
+            user_details: {
+                is_signed_in: false
+            }
+        },
+        methods: {
+            do_after_load: function () {
+                this.filter_navigation_bar();
+                this.check_user_details_exist();
+            },
+            filter_navigation_bar: function () {
+                this.navigation_list = this.navigation_list.filter(x => x.href !== window.location.pathname);
+            },
+            check_user_details_exist: function () {
+
+                if (Cookies.get('accomox_user_details') !== undefined) {
+                    this.user_details = JSON.parse(Cookies.get('bc2k19_user_details'));
+                }
+            }
+        }, mounted: function () {
+            this.$nextTick(function () {
+                this.do_after_load();
+            })
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        let elems = document.querySelectorAll('.sidenav');
+        let instances = M.Sidenav.init(elems);
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        var elems = document.querySelectorAll('.modal');
+        var instances = M.Modal.init(elems);
+    });
+
+    function onSignIn(googleUser) {
+
+        $('#sign_in_modal').modal('close');
+        let profile = googleUser.getBasicProfile();
+        let user_details = {
+            is_signed_in: true,
+            id_token: googleUser.getAuthResponse().id_token,
+            h_id: profile.getId(),
+            name: profile.getName(),
+            image_url: profile.getImageUrl(),
+            email: profile.getEmail()
+        };
+        Cookies.set('bc2k19_user_details', JSON.stringify(user_details));
+        my_navbar.user_details = user_details;
+        axios.post('/db/google/sign_in', user_details)
+            .then(function (response) {
+                if (response.data.RESPONSE_CODE === 108200) {
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+
+    function signOut() {
+        Cookies.remove('bc2k19_user_details');
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+            location.reload();
+            my_navbar.user_details.is_signed_in = false;
+        });
+    }
+
+
+</script>

@@ -1,0 +1,7 @@
+body {
+    font-family: 'Slabo 27px', serif;
+}
+a, a:hover, a:visited, a:link, a:active {
+    cursor: pointer;
+    text-decoration: none;
+}

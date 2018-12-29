@@ -1,0 +1,33 @@
+version: '3.6'
+services:
+  main:
+    build: ./main
+    restart: always
+    ports:
+      - 3200:3000
+    depends_on:
+      - graphql-engine
+    environment:
+      - GRAPHQL_ENGINE_DATABASE_HOST=graphql-engine
+    links:
+      - graphql-engine
+  postgres:
+    image: postgres
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  graphql-engine:
+    image: hasura/graphql-engine:v1.0.0-alpha33
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    restart: always
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:@postgres:5432/postgres
+    command:
+      - graphql-engine
+      - serve
+      - --enable-console
+volumes:
+  db_data:

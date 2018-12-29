@@ -1,0 +1,14 @@
+.design_over_tshirt {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-left: 29%;
+    margin-top: 30%;
+    width: 40%;
+}
+
+#tshirt_show_updated_design {
+    position: absolute;
+    top: 0;
+    left: 0;
+}

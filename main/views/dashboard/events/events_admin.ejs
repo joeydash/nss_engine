@@ -1,0 +1,273 @@
+<style>
+
+</style>
+
+<div id="add_event_pane">
+    <div class="row" style="padding: 3vw;">
+        <transition name="slide">
+
+            <div class="col l6 offset-m2 s12 m8 offset-l3 w3-card-4" v-if="is_want_to_add" style="padding: 3vw;">
+                <center>
+
+                    <h4>Add Event</h4>
+                </center>
+                <div>
+                    <br>
+                    <p>
+                        <label class="w3-text-grey">Name</label>
+                        <input class="w3-input w3-border" type="text" required="" v-model="event_details.name">
+                    </p>
+                    <p>
+                        <label class="w3-text-grey">Details</label>
+                        <textarea style="height:100px;" class="w3-input w3-border"
+                                  v-model="event_details.details"></textarea>
+                    </p>
+                    <p>
+                    <div class="right-align">
+                        <img v-if="event_details.image_url !== ''" :src="event_details.image_url"
+                             style="max-width: 100px;margin-right: 5vw;">
+
+                        <input type="file" name="uploadfile" id="img" style="display:none;" @change="on_image_upload"/>
+                        <label v-if="!image_is_uploading" for="img" class="blue-grey-text" style="cursor: pointer"><i
+                                    class="fas fa-cloud-upload-alt"></i> &nbsp;&nbsp;UPLOAD IMAGE</label>
+                    </div>
+                    <div v-if="image_is_uploading" class="progress" style="margin-top: -1.5px;">-->
+                        <div class="indeterminate blue"></div>
+                    </div>
+                    </p>
+                    <p>
+                        <label class="w3-text-grey">Credits</label>
+                        <input class="w3-input w3-border" type="number" required="" v-model="event_details.credits">
+                    </p>
+                    <br>
+                    <p>
+                    <center>
+                        <button v-if="!is_want_to_edit" @click="save_event" type="button"
+                                class="w3-btn w3-padding w3-blue"
+                                style="width:45%">SAVE
+                            &nbsp; ❯
+                        </button>
+                        <button @click="edit_event(event_details.h_id)" v-if="is_want_to_edit" type="button"
+                                class="w3-btn w3-padding w3-blue"
+                                style="width:45%">EDIT
+                            &nbsp; ❯
+                        </button>
+                        <button @click="()=>{
+
+                   is_want_to_add = false;
+                   is_want_to_edit = false;
+                   reset_fields();
+                    }" type="button" class="w3-btn w3-padding w3-red right-aligned"
+                                style="width:45%">CANCEL
+                            &nbsp; X
+                        </button>
+                    </center>
+                    </p>
+                </div>
+
+            </div>
+        </transition>
+        <div v-if="!is_want_to_add" class="col l12  s12 m12">
+
+            <center>
+                <transition name="slide">
+                    <h4 v-if="!is_want_to_add">Events &nbsp;&nbsp;&nbsp; <a
+                                class="btn-floating btn-large waves-effect waves-light red">
+                            <i
+                                    class="material-icons"
+                                    @click="()=>{
+                                is_want_to_add = true
+                        }">
+                                add
+                            </i>
+                        </a>
+                    </h4>
+                </transition>
+
+                <transition name="slide">
+
+                    <div v-if="is_no_data">
+                        <img style="margin-top: 10vw;"
+                             src="data:image/png;base64,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">
+                        <h5> No data found</h5>
+                    </div>
+                </transition>
+            </center>
+            <transition name="slide">
+                <div v-if="!is_no_data">
+                    <center>
+                        <br>
+                        <table class="w3-responsive w3-table">
+                            <thead>
+                            <tr class="w3-hover-blue">
+                                <th>Actions</th>
+                                <th v-for="event_key in event_keys">{{event_key}}</th>
+                            </tr>
+
+                            </thead>
+
+                            <tbody>
+                            <tr class="w3-hover-blue-gray " v-for="event in events_list">
+                                <td>
+                                    <a @click="()=>{
+                                is_want_to_add = true;
+                                is_want_to_edit = true;
+                                event_details = event;
+                            }" class="green-text">
+                                        Edit
+                                    </a>
+                                    &nbsp;
+                                    <a class="red-text" @click="delete_entry(event.h_id)">
+                                        Delete
+                                    </a>
+                                </td>
+                                <td v-for="event_key in event_keys">{{event[event_key]}}</td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </center>
+                </div>
+            </transition>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    let add_event_pane = new Vue({
+        el: '#add_event_pane',
+        data: {
+            event_keys: [],
+            events_list: [],
+            image_is_uploading: false,
+            is_want_to_edit: false,
+            is_want_to_add: false,
+            is_no_data: true,
+            event_details: {
+                name: "",
+                details: "",
+                image_url: "",
+                credits : 0
+            },
+        },
+        methods: {
+            do_after_load: function () {
+                this.get_events();
+            },
+            save_event: function () {
+
+                if (
+                    this.event_details.name !== "" && this.event_details.name !== null
+                ) {
+                    axios.post('/dashboard/insert/event', this.event_details)
+                        .then(function (response) {
+                            if (response.data.RESPONSE_CODE === 108200) {
+                                M.toast({html: '<span style="color: lightgreen; ">Event added </span>'});
+                                add_event_pane.is_want_to_add = false;
+                                add_event_pane.get_events();
+                                add_event_pane.reset_fields();
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                } else {
+                    M.toast({html: '<span style="color: lightcoral;">Fill in name at least</span>'});
+                }
+
+            },
+            edit_event: function (h_id) {
+                if (
+                    this.event_details.name !== "" && this.event_details.name !== null
+                ) {
+                    axios.post('/dashboard/edit/event/' + h_id, this.event_details)
+                        .then(function (response) {
+                            if (response.data.RESPONSE_CODE === 108200) {
+                                M.toast({html: '<span style="color: lightgreen; ">Event has been edited </span>'});
+                                add_event_pane.is_want_to_add = false;
+                                add_event_pane.is_want_to_edit = false;
+                                add_event_pane.get_events();
+                                add_event_pane.reset_fields();
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                } else {
+                    M.toast({html: '<span style="color: lightcoral; ">Fill in name at least</span>'});
+                }
+
+            },
+            reset_fields: function () {
+                this.event_details = {
+                    name: "",
+                    details: "",
+                    image_url: "",
+                    credits: 0
+                };
+            },
+            on_image_upload(e) {
+                add_event_pane.image_is_uploading = true;
+                let files = e.target.files || e.dataTransfer.files;
+                if (!files.length)
+                    return;
+                this.upload_to_cloudinary_and_save_in_db(files[0]);
+            },
+            upload_to_cloudinary_and_save_in_db(file) {
+                let image = new Image();
+                let reader = new FileReader();
+
+                reader.onload = (e) => {
+                    image = e.target.result;
+                    axios.post('/dashboard/upload/image', {
+                        file: image,
+                    }).then(function (response) {
+                        add_event_pane.event_details.image_url = response.data.secure_url;
+                        add_event_pane.image_is_uploading = false;
+
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                };
+                reader.readAsDataURL(file);
+            },
+            get_events: function () {
+                axios.post('/dashboard/select/events/100/0')
+                    .then(function (response) {
+                        if (response.data.results.length > 0) {
+                            add_event_pane.events_list = response.data.results;
+                            add_event_pane.event_keys = Object.keys(response.data.results[0]);
+                            add_event_pane.is_no_data = false;
+                        } else {
+                            add_event_pane.is_no_data = true;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            delete_entry: function (h_id) {
+                axios.post('/dashboard/delete/events/' + h_id)
+                    .then(function (response) {
+                        if (response.data.RESPONSE_CODE === 108200) {
+                            M.toast({html: 'Data deleted'});
+                            add_event_pane.get_events();
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }
+
+        }, mounted: function () {
+            this.$nextTick(function () {
+                this.do_after_load();
+            })
+        }
+    });
+
+
+</script>

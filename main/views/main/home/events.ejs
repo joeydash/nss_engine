@@ -1,0 +1,118 @@
+<style>
+    h5 {
+        overflow: hidden;
+        text-align: center;
+    }
+
+    h5:before,
+    h5:after {
+        background-color: #000;
+        content: "";
+        display: inline-block;
+        height: 1px;
+        position: relative;
+        vertical-align: middle;
+        width: 50%;
+    }
+
+    h5:before {
+        right: 0.5em;
+        margin-left: -50%;
+    }
+
+    h5:after {
+        left: 0.5em;
+        margin-right: -50%;
+    }
+</style>
+<div id="events_list">
+    <div class="row card" style="margin: 1.5vw;">
+        <div class="row " style="padding: 1.5vw;">
+            <div class="col l3 s12 ">
+                <a href="">
+                    <h4 class="teal-text heading_type_2">
+                        All Events
+                    </h4>
+                </a>
+            </div>
+        </div>
+        <div class="row">
+
+            <div v-for="event in events_list" class="col s10 offset-s1 m6 l2 zoom">
+
+                <transition name="slide">
+                    <div class="card ":id="event.h_id">
+                        <a @click="select_event(event.h_id)">
+                            <div class="card-image" v-if="event.image_url">
+                                <img class="responsive-img" :src="event.image_url" id="events_image">
+                            </div>
+                            <div class="card-action bg_type_1 center">
+                                {{event.name}}
+                            </div>
+                        </a>
+                    </div>
+                </transition>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="event_modal" class="modal bg_type_1">
+        <div class="modal-content">
+            <div class="row">
+                <div class="col l6 s12  img-responsive" style=" margin-top: 2vh">
+                    <center>
+                        <a :href="event_on_focus.image_url">
+                            <img :src="event_on_focus.image_url" class="w3-hover-shadow" style="max-width: 100%;">
+                        </a>
+                    </center>
+
+
+                </div>
+                <div class="col l6 s12 center" style="margin-top: 2vh">
+                    <h3>{{event_on_focus.name}}</h3>
+                    <p v-html="event_on_focus.details"></p>
+                    <p><strong>Credits: </strong> : {{event_on_focus.credits}}</p>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<script>
+    let events_list = new Vue({
+        el: "#events_list",
+        data: {
+            events_list: [],
+            event_on_focus : {}
+        },
+        methods: {
+            get_events: function () {
+                axios.post('/db/anonymous/select/events/1000/0')
+                    .then(function (response) {
+                        events_list.events_list = response.data.results;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            select_event: function (h_id) {
+                $('#event_modal').modal('open');
+                for (i = 0; i < this.events_list.length; i++) {
+                    if (this.events_list[i].h_id === h_id) {
+                        this.event_on_focus = this.events_list[i];
+                    }
+                }
+            }
+        },
+        mounted: function () {
+            this.$nextTick(function () {
+                this.get_events();
+            })
+        }
+    });
+
+</script>

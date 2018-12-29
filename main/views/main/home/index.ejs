@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <% include ../common/head.ejs %>
+    <!-- CSS  -->
+
+
+    <!--icons-->
+
+
+
+    <!--fonts-->
+
+
+    <!--scripts-->
+
+
+    <style>
+        <% include ../../common/style.css %>
+        <% include ../common/style.css %>
+    </style>
+
+</head>
+
+<body>
+
+<div id="main" style="display: none;">
+    <% include main.ejs %>
+
+</div>
+<div id="loader">
+    <% include ../common/loader.ejs %>
+</div>
+
+
+<script>
+    <% include ../../common/script.js %>
+    <% include ../common/script.js %>
+    let loadInterval = setInterval(function () {
+        if (document.readyState === 'complete') {
+            clearInterval(loadInterval);
+            document.getElementById("loader").style.display = "none";
+            document.getElementById("main").style.display = "block";
+        }
+    }, 200);
+
+
+    let show_loader = function () {
+        document.getElementById("loader").style.display = "block";
+        document.getElementById("main").style.display = "none";
+    }
+
+    let hide_loader = function () {
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("main").style.display = "block";
+    }
+</script>
+</body>
+
+</html>

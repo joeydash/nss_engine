@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin panel</title>
+    <meta charset="utf-8">
+    <meta name="description" content="Best Fest Ever of Delhi">
+    <meta name="author" content="joeydash">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="google-signin-client_id"
+          content="955316250339-46j5dnc4h5dis0oen1lu9mlf9og2req6.apps.googleusercontent.com">
+    <link rel="icon" href="/images/icon.gif">
+
+
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
+
+    <!--fonts-->
+
+
+
+    <!--icons-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+          integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+
+    <style>
+        <%include ../../common/style.css%>
+    </style>
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="//widget.cloudinary.com/global/all.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+</head>
+<body>
+
+<div id="loader">
+    <% include ../common/loader.ejs %>
+</div>
+
+<% include main.ejs %>
+
+<script>
+
+    <% include ../../common/script.js %>
+
+    let loadInterval = setInterval(function () {
+        if (document.readyState === 'complete') {
+            clearInterval(loadInterval);
+            document.getElementById("loader").remove();
+        }
+    }, 200);
+
+</script>
+
+
+
+</body>
+
+</html>

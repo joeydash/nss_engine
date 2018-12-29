@@ -1,0 +1,172 @@
+<style>
+    #slider, .slide-content {
+        height: 60vh;
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    .slide {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .slide-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .slide-content span {
+        font-size: 1.5rem;
+        color: #fff;
+    }
+
+    .arrow {
+        cursor: pointer;
+        position: absolute;
+        top: 47%;
+        margin-top: -35px;
+        width: 0;
+        height: 0;
+        border-style: solid;
+
+        transition: all .5s ease-out;
+    }
+
+    #arrow-left {
+        border-width: 10px 20px 10px 0;
+        border-color: transparent #fff transparent transparent;
+        left: 0;
+        margin-left: 30px;
+    }
+
+    #arrow-right {
+        border-width: 10px 0 10px 20px;
+        border-color: transparent transparent transparent #fff;
+        right: 0;
+        margin-right: 30px;
+    }
+
+    #arrow-right:hover {
+        border-color: #999 transparent #999 #444;
+        box-shadow: 0 0 0 10px #999;
+    }
+
+    #arrow-left:hover {
+        border-color: #999 #333 #999 transparent;
+        box-shadow: 0 0 0 10px #999;
+    }
+
+</style>
+
+
+<!--TODO Optimise-->
+
+<div  class="wrap" id="my_carousel" style="margin-top: 8px;">
+    <div id="arrow-left" class="arrow"></div>
+    <div id="slider">
+        <a v-for="item in carousel_items" :href="item.href" >
+            <div class="slide slide1" v-bind:style="{ backgroundImage: 'url(' + item.src + ')' }">
+                <div class="slide-content">
+                    <span>We are Tshirt Company</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div id="arrow-right" class="arrow"></div>
+</div>
+
+<script>
+    let my_carousel = new Vue({
+        el: '#my_carousel',
+        data: {
+            time_interval: 5000,
+            carousel_items: [
+                {
+                    src: "https://unsplash.it/536",
+                    title: "We are Tshirt Company",
+                    href: "#"
+                },
+                {
+                    src: "https://unsplash.it/485",
+                    title: "We are Cool",
+                    href: "#"
+                },
+                {
+                    src: "https://unsplash.it/919",
+                    title: "We are Coming",
+                    href: "#"
+                }
+            ]
+        },
+        methods: {
+            do_after_load: function () {
+                this.filter_navigation_bar();
+            }
+
+        },
+    });
+
+
+    let sliderImgs = document.querySelectorAll('.slide'),
+        arrowLeft = document.querySelector('#arrow-left'),
+        arrowRight = document.querySelector('#arrow-right'),
+        current = 0;
+
+    //Reset Images to "display: none;"
+    let reset = function () {
+        for (let i = 0; i < sliderImgs.length; i++) {
+            sliderImgs[i].style.display = 'none';
+        }
+    }
+
+    //Init Slide
+    let startSlide = function () {
+        reset();
+        sliderImgs[0].style.display = 'block';
+    }
+
+    //show previous
+    let slideLeft = function () {
+        reset();
+        sliderImgs[current - 1].style.display = 'block';
+        current--;
+    }
+
+    //Show Next
+    let slideRight = function () {
+        reset();
+        sliderImgs[current + 1].style.display = 'block';
+        current++;
+    }
+
+    //Left arrow click
+    arrowLeft.addEventListener('click', function () {
+        if (current === 0) {
+            current = sliderImgs.length;
+        }
+        slideLeft();
+    })
+
+    //right arrow click
+    arrowRight.addEventListener('click', function () {
+        if (current === sliderImgs.length - 1) {
+            current = -1;
+        }
+        slideRight();
+    });
+
+    //Timed slider
+    setInterval(function () {
+        if (current === sliderImgs.length - 1) {
+            current = -1;
+        }
+
+        slideRight();
+    }, my_carousel.time_interval);
+
+    startSlide();
+</script>
