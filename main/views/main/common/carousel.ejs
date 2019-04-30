@@ -71,7 +71,7 @@
         <a v-for="item in carousel_items" :href="item.href" >
             <div class="slide slide1" v-bind:style="{ backgroundImage: 'url(' + item.src + ')' }">
                 <div class="slide-content">
-                    <span>We are Tshirt Company</span>
+                    <span>{{item.title}}</span>
                 </div>
             </div>
         </a>
