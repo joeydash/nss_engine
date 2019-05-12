@@ -71,7 +71,7 @@
         <a v-for="item in carousel_items" :href="item.href" >
             <div class="slide slide1" v-bind:style="{ backgroundImage: 'url(' + item.src + ')' }">
                 <div class="slide-content">
-                    <span>We are Tshirt Company</span>
+                    <span>{{item.title}}</span>
                 </div>
             </div>
         </a>
@@ -86,18 +86,18 @@
             time_interval: 5000,
             carousel_items: [
                 {
-                    src: "https://unsplash.it/536",
-                    title: "We are Tshirt Company",
+                    src: "https://scontent-bom1-2.xx.fbcdn.net/v/t31.0-8/22550299_1816270341734534_7998112426580219877_o.jpg?_nc_cat=109&_nc_ht=scontent-bom1-2.xx&oh=a2c86263366ea6c6b8c0f6d2ac2c968a&oe=5D64A42C",
+                    title: "NSS 2017-2018",
                     href: "#"
                 },
                 {
-                    src: "https://unsplash.it/485",
-                    title: "We are Cool",
+                    src: "https://scontent-bom1-2.xx.fbcdn.net/v/t31.0-8/14107882_1352921711402735_2837890203811015132_o.jpg?_nc_cat=105&_nc_ht=scontent-bom1-2.xx&oh=774a3c96d05820ebe5ab6bcbc9f2de55&oe=5D325437",
+                    title: "NSS 2016-2017",
                     href: "#"
                 },
                 {
-                    src: "https://unsplash.it/919",
-                    title: "We are Coming",
+                    src: "https://scontent-bom1-2.xx.fbcdn.net/v/t31.0-8/11078177_1038485859512990_8482022615498744348_o.jpg?_nc_cat=102&_nc_ht=scontent-bom1-2.xx&oh=5102a7565baa579750b3f3f48ab1bf87&oe=5D706BC9",
+                    title: "NSS 2015-2016",
                     href: "#"
                 }
             ]

@@ -2,7 +2,7 @@ server {
     listen 80 default_server;
     listen [::]:80 default_server;
 
-    server_name nss.accomox.in;
+    server_name nss.accomox.in nssiitm.tk www.nssiitm.tk;
 
     error_log  /var/log/nginx/error.log;
     access_log /var/log/nginx/access.log;
@@ -22,7 +22,7 @@ server {
     listen 80 ;
     listen [::]:80 ;
 
-    server_name nss-console.accomox.in;
+    server_name nss-console.accomox.in hasura.nssiitm.tk;
 
     error_log  /var/log/nginx/error.log;
     access_log /var/log/nginx/access.log;
