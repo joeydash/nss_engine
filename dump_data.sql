@@ -191,19 +191,6 @@ COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
 
 --
--- Name: first_agg(anyelement, anyelement); Type: FUNCTION; Schema: hdb_catalog; Owner: postgres
---
-
-CREATE FUNCTION hdb_catalog.first_agg(anyelement, anyelement) RETURNS anyelement
-    LANGUAGE sql IMMUTABLE STRICT
-    AS $_$
-       SELECT $1;
-$_$;
-
-
-ALTER FUNCTION hdb_catalog.first_agg(anyelement, anyelement) OWNER TO postgres;
-
---
 -- Name: hdb_table_oid_check(); Type: FUNCTION; Schema: hdb_catalog; Owner: postgres
 --
 
@@ -241,43 +228,6 @@ $$;
 
 
 ALTER FUNCTION hdb_catalog.inject_table_defaults(view_schema text, view_name text, tab_schema text, tab_name text) OWNER TO postgres;
-
---
--- Name: last_agg(anyelement, anyelement); Type: FUNCTION; Schema: hdb_catalog; Owner: postgres
---
-
-CREATE FUNCTION hdb_catalog.last_agg(anyelement, anyelement) RETURNS anyelement
-    LANGUAGE sql IMMUTABLE STRICT
-    AS $_$
-        SELECT $2;
-$_$;
-
-
-ALTER FUNCTION hdb_catalog.last_agg(anyelement, anyelement) OWNER TO postgres;
-
---
--- Name: first(anyelement); Type: AGGREGATE; Schema: hdb_catalog; Owner: postgres
---
-
-CREATE AGGREGATE hdb_catalog.first(anyelement) (
-    SFUNC = hdb_catalog.first_agg,
-    STYPE = anyelement
-);
-
-
-ALTER AGGREGATE hdb_catalog.first(anyelement) OWNER TO postgres;
-
---
--- Name: last(anyelement); Type: AGGREGATE; Schema: hdb_catalog; Owner: postgres
---
-
-CREATE AGGREGATE hdb_catalog.last(anyelement) (
-    SFUNC = hdb_catalog.last_agg,
-    STYPE = anyelement
-);
-
-
-ALTER AGGREGATE hdb_catalog.last(anyelement) OWNER TO postgres;
 
 SET default_tablespace = '';
 
@@ -363,12 +313,12 @@ CREATE VIEW hdb_catalog.hdb_foreign_key_constraint AS
  SELECT (q.table_schema)::text AS table_schema,
     (q.table_name)::text AS table_name,
     (q.constraint_name)::text AS constraint_name,
-    (hdb_catalog.first(q.constraint_oid))::integer AS constraint_oid,
-    (hdb_catalog.first(q.ref_table_table_schema))::text AS ref_table_table_schema,
-    (hdb_catalog.first(q.ref_table))::text AS ref_table,
+    (min(q.constraint_oid))::integer AS constraint_oid,
+    min((q.ref_table_table_schema)::text) AS ref_table_table_schema,
+    min((q.ref_table)::text) AS ref_table,
     json_object_agg(ac.attname, afc.attname) AS column_mapping,
-    (hdb_catalog.first(q.confupdtype))::text AS on_update,
-    (hdb_catalog.first(q.confdeltype))::text AS on_delete
+    min((q.confupdtype)::text) AS on_update,
+    min((q.confdeltype)::text) AS on_delete
    FROM ((( SELECT ctn.nspname AS table_schema,
             ct.relname AS table_name,
             r.conrelid AS table_id,
@@ -519,125 +469,24 @@ CREATE TABLE hdb_catalog.hdb_version (
 ALTER TABLE hdb_catalog.hdb_version OWNER TO postgres;
 
 --
--- Name: migration_settings; Type: TABLE; Schema: hdb_catalog; Owner: postgres
+-- Name: remote_schemas; Type: TABLE; Schema: hdb_catalog; Owner: postgres
 --
 
-CREATE TABLE hdb_catalog.migration_settings (
-    setting text NOT NULL,
-    value text NOT NULL
-);
-
-
-ALTER TABLE hdb_catalog.migration_settings OWNER TO postgres;
-
---
--- Name: schema_migrations; Type: TABLE; Schema: hdb_catalog; Owner: postgres
---
-
-CREATE TABLE hdb_catalog.schema_migrations (
-    version bigint NOT NULL,
-    dirty boolean NOT NULL
-);
-
-
-ALTER TABLE hdb_catalog.schema_migrations OWNER TO postgres;
-
---
--- Name: ennum_users_career; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.ennum_users_career (
-    name text NOT NULL
-);
-
-
-ALTER TABLE public.ennum_users_career OWNER TO postgres;
-
---
--- Name: enum_user_roles; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.enum_user_roles (
-    name text NOT NULL
-);
-
-
-ALTER TABLE public.enum_user_roles OWNER TO postgres;
-
---
--- Name: events; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.events (
-    id integer NOT NULL,
-    h_id text NOT NULL,
-    name text NOT NULL,
-    details text,
-    image_url text,
-    price numeric DEFAULT 0,
-    goqles_url text,
-    date date,
-    user_h_id text NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    is_buyable boolean DEFAULT false NOT NULL,
-    is_registrable boolean DEFAULT false NOT NULL
-);
-
-
-ALTER TABLE public.events OWNER TO postgres;
-
---
--- Name: events_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.events_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.events_id_seq OWNER TO postgres;
-
---
--- Name: events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.events_id_seq OWNED BY public.events.id;
-
-
---
--- Name: users; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.users (
-    id integer NOT NULL,
-    h_id text NOT NULL,
-    email text NOT NULL,
+CREATE TABLE hdb_catalog.remote_schemas (
+    id bigint NOT NULL,
     name text,
-    phone_number text,
-    dob date,
-    school_name text,
-    school_city text,
-    standard text,
-    image_url text,
-    role text,
-    career text,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    password text
+    definition json,
+    comment text
 );
 
 
-ALTER TABLE public.users OWNER TO postgres;
+ALTER TABLE hdb_catalog.remote_schemas OWNER TO postgres;
 
 --
--- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: remote_schemas_id_seq; Type: SEQUENCE; Schema: hdb_catalog; Owner: postgres
 --
 
-CREATE SEQUENCE public.users_id_seq
-    AS integer
+CREATE SEQUENCE hdb_catalog.remote_schemas_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -645,27 +494,20 @@ CREATE SEQUENCE public.users_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.users_id_seq OWNER TO postgres;
+ALTER TABLE hdb_catalog.remote_schemas_id_seq OWNER TO postgres;
 
 --
--- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: remote_schemas_id_seq; Type: SEQUENCE OWNED BY; Schema: hdb_catalog; Owner: postgres
 --
 
-ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
-
-
---
--- Name: events id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.events ALTER COLUMN id SET DEFAULT nextval('public.events_id_seq'::regclass);
+ALTER SEQUENCE hdb_catalog.remote_schemas_id_seq OWNED BY hdb_catalog.remote_schemas.id;
 
 
 --
--- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: remote_schemas id; Type: DEFAULT; Schema: hdb_catalog; Owner: postgres
 --
 
-ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+ALTER TABLE ONLY hdb_catalog.remote_schemas ALTER COLUMN id SET DEFAULT nextval('hdb_catalog.remote_schemas_id_seq'::regclass);
 
 
 --
@@ -748,10 +590,7 @@ hdb_catalog	hdb_query_template	t
 hdb_catalog	event_triggers	t
 hdb_catalog	event_log	t
 hdb_catalog	event_invocation_logs	t
-public	ennum_users_career	f
-public	enum_user_roles	f
-public	events	f
-public	users	f
+hdb_catalog	remote_schemas	t
 \.
 
 
@@ -760,76 +599,23 @@ public	users	f
 --
 
 COPY hdb_catalog.hdb_version (version, upgraded_on) FROM stdin;
-4	2018-11-22 13:05:23.455861+00
+6	2018-12-29 20:18:07.678015+00
 \.
 
 
 --
--- Data for Name: migration_settings; Type: TABLE DATA; Schema: hdb_catalog; Owner: postgres
+-- Data for Name: remote_schemas; Type: TABLE DATA; Schema: hdb_catalog; Owner: postgres
 --
 
-COPY hdb_catalog.migration_settings (setting, value) FROM stdin;
-migration_mode	true
+COPY hdb_catalog.remote_schemas (id, name, definition, comment) FROM stdin;
 \.
 
 
 --
--- Data for Name: schema_migrations; Type: TABLE DATA; Schema: hdb_catalog; Owner: postgres
+-- Name: remote_schemas_id_seq; Type: SEQUENCE SET; Schema: hdb_catalog; Owner: postgres
 --
 
-COPY hdb_catalog.schema_migrations (version, dirty) FROM stdin;
-\.
-
-
---
--- Data for Name: ennum_users_career; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.ennum_users_career (name) FROM stdin;
-google
-\.
-
-
---
--- Data for Name: enum_user_roles; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.enum_user_roles (name) FROM stdin;
-user
-anonymous
-volunteer
-manager
-\.
-
-
---
--- Data for Name: events; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.events (id, h_id, name, details, image_url, price, goqles_url, date, user_h_id, created_at, is_buyable, is_registrable) FROM stdin;
-\.
-
-
---
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.users (id, h_id, email, name, phone_number, dob, school_name, school_city, standard, image_url, role, career, created_at, password) FROM stdin;
-\.
-
-
---
--- Name: events_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.events_id_seq', 61, true);
-
-
---
--- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.users_id_seq', 992, true);
+SELECT pg_catalog.setval('hdb_catalog.remote_schemas_id_seq', 1, false);
 
 
 --
@@ -897,83 +683,19 @@ ALTER TABLE ONLY hdb_catalog.hdb_table
 
 
 --
--- Name: migration_settings migration_settings_pkey; Type: CONSTRAINT; Schema: hdb_catalog; Owner: postgres
+-- Name: remote_schemas remote_schemas_name_key; Type: CONSTRAINT; Schema: hdb_catalog; Owner: postgres
 --
 
-ALTER TABLE ONLY hdb_catalog.migration_settings
-    ADD CONSTRAINT migration_settings_pkey PRIMARY KEY (setting);
-
-
---
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: hdb_catalog; Owner: postgres
---
-
-ALTER TABLE ONLY hdb_catalog.schema_migrations
-    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+ALTER TABLE ONLY hdb_catalog.remote_schemas
+    ADD CONSTRAINT remote_schemas_name_key UNIQUE (name);
 
 
 --
--- Name: ennum_users_career ennum_users_career_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: remote_schemas remote_schemas_pkey; Type: CONSTRAINT; Schema: hdb_catalog; Owner: postgres
 --
 
-ALTER TABLE ONLY public.ennum_users_career
-    ADD CONSTRAINT ennum_users_career_pkey PRIMARY KEY (name);
-
-
---
--- Name: enum_user_roles enum_user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.enum_user_roles
-    ADD CONSTRAINT enum_user_roles_pkey PRIMARY KEY (name);
-
-
---
--- Name: events events_h_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.events
-    ADD CONSTRAINT events_h_id_key UNIQUE (h_id);
-
-
---
--- Name: events events_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.events
-    ADD CONSTRAINT events_id_key UNIQUE (id);
-
-
---
--- Name: events events_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.events
-    ADD CONSTRAINT events_pkey PRIMARY KEY (id, h_id);
-
-
---
--- Name: users users_h_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_h_id_key UNIQUE (h_id);
-
-
---
--- Name: users users_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_id_key UNIQUE (id);
-
-
---
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_pkey PRIMARY KEY (id, h_id);
+ALTER TABLE ONLY hdb_catalog.remote_schemas
+    ADD CONSTRAINT remote_schemas_pkey PRIMARY KEY (id);
 
 
 --
